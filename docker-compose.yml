@@ -1,0 +1,65 @@
+version: "3.8"
+services:
+  mysql-product:
+    image: mysql:8
+    container_name: mysql-product
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: product_service
+    ports:
+      - "3307:3306"
+    networks:
+      - inventory-net
+
+  mysql-inventory:
+    image: mysql:8
+    container_name: mysql-inventory
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventory_service
+    ports:
+      - "3308:3306"
+    networks:
+      - inventory-net
+
+  mysql-order:
+    image: mysql:8
+    container_name: mysql-order
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: order_service
+    ports:
+      - "3309:3306"
+    networks:
+      - inventory-net
+
+  product-service:
+    build: ./product-service
+    depends_on:
+      - mysql-product
+    ports:
+      - "8081:8080"
+    networks:
+      - inventory-net
+
+  inventory-service:
+    build: ./inventory-service
+    depends_on:
+      - mysql-inventory
+    ports:
+      - "8082:8080"
+    networks:
+      - inventory-net
+
+  order-service:
+    build: ./order-service
+    depends_on:
+      - mysql-order
+    ports:
+      - "8083:8080"
+    networks:
+      - inventory-net
+
+networks:
+  inventory-net:
+    driver: bridge
